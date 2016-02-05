@@ -15,7 +15,6 @@ const escapedEntities = {
 const routeKeyEvent = function(e) {
   const key = keysight(e);
   const conditionalCapitalize = (key) => ((e.shiftKey && key.char === key.key) ? upperCase : identity)(key.char);
-  console.log(e, key);
   if (e.keyCode === 8) {
     editor.dispatch({type: 'REMOVECHAR'});
     return false;

@@ -2,12 +2,12 @@
  * Created by faide on 2016-02-04. © Varafy
  */
 
-import { createStore } from 'redux';
+import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
 
 const initialState = {
   string: '',
   caret: 0,
-  currentNode: 0
+  currentNode: 0,
 };
 
 function addChar(state, action) {
@@ -39,6 +39,21 @@ function editor(state = '', action) {
   }
 }
 
-let store = createStore(editor, initialState, window.devToolsExtension ? window.devToolsExtension() : undefined);
+const logResult = store => next => action => {
+  console.group();
+  console.log('dispatching', action);
+  const result = next(action);
+  console.log('result:', store.getState());
+  console.groupEnd();
+  return result;
+};
+
+let store = createStore(
+  editor,
+  initialState,
+  compose(
+    applyMiddleware(logResult),
+      (window.devToolsExtension ? window.devToolsExtension() : f => f)
+  ));
 
 export default store;
