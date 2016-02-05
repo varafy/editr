@@ -4,11 +4,33 @@
 
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
 
-const initialState = {
-  string: '',
-  caret: 0,
-  currentNode: 0,
+const rowDefaults = {
+  id: 0,
+  type: 'text',
+  content: ''
 };
+
+const initialState = {
+  rows: [],
+  selectionStart: {
+    row: 0,
+    offset: 0
+  },
+  selectionEnd: {
+    row: 0,
+    offset: 0
+  }
+};
+
+// ROWS REDUCERS
+function addRow(state, action) {
+  return [
+    ...state,
+    Object.assign({}, rowDefaults, {
+      id: state.reduce((maxID, row) => Math.max(row.id, maxID), -1) + 1
+    })
+  ]
+}
 
 function addChar(state, action) {
   return Object.assign({}, state, {
