@@ -27,7 +27,6 @@ const routeKeyEvent = function(e) {
   }
 };
 
-
 document.onkeydown = routeKeyEvent;
 
 const renderString = function(str) {

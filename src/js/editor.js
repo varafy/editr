@@ -1,64 +1,64 @@
 /**
  * Created by faide on 2016-02-04. © Varafy
  */
+"use strict";
 
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
+import { createSelector } from 'reselect';
 
-const rowDefaults = {
+const getSelection = (state) => state.selection;
+const select = createSelector(getSelection, (selection) => selection);
+
+const rowDefault = {
   id: 0,
   type: 'text',
   content: ''
 };
 
+const selectionDefault = {
+  startRow: 0,
+  startOffset: 0,
+  endRow: 0,
+  endOffset: 0
+};
+
 const initialState = {
   rows: [],
-  selectionStart: {
-    row: 0,
-    offset: 0
-  },
-  selectionEnd: {
-    row: 0,
-    offset: 0
-  }
+  selection: {}
 };
 
 // ROWS REDUCERS
 function addRow(state, action) {
-  return [
-    ...state,
-    Object.assign({}, rowDefaults, {
-      id: state.reduce((maxID, row) => Math.max(row.id, maxID), -1) + 1
-    })
-  ]
+  return state;
 }
 
-function addChar(state, action) {
-  return Object.assign({}, state, {
-    string: state.string.slice(0, state.caret) + action.char + state.string.slice(state.caret),
-    caret: state.caret + 1
-  });
-}
+function removeRow(state, action) {
+  return state;
+};
 
-function removeChar(state, action) {
-  return Object.assign({}, state, {
-    string: state.string.slice(0, state.caret - 1) + state.string.slice(state.caret),
-    caret: Math.max(0, state.caret - 1),
-  });
-}
-
-
-
-function editor(state = '', action) {
+function selection(state = selectionDefault, action) {
   switch (action.type) {
-    case 'ADDROW':
-      return addRow(state, action);
-    case 'ADDCHAR':
-      return addChar(state, action);
-    case 'REMOVECHAR':
-      return removeChar(state, action);
     default:
       return state;
   }
+}
+
+function rows(state = [], action) {
+  switch (action.type) {
+    case 'ADDROW':
+      return addRow(state, action);
+    case 'REMOVEROW':
+      return removeRow(state, action);
+    case 'ADDCHARS':
+    case 'REMOVECHARS':
+      return rowReduce(state, action);
+    default:
+      return state;
+  }
+}
+
+function rowReduce(state = rowDefault, action) {
+
 }
 
 const logResult = store => next => action => {
@@ -70,12 +70,18 @@ const logResult = store => next => action => {
   return result;
 };
 
+const editorReducer = combineReducers({
+  rows, selection
+})
+
 let store = createStore(
-  editor,
+  editorReducer,
   initialState,
   compose(
     applyMiddleware(logResult),
       (window.devToolsExtension ? window.devToolsExtension() : f => f)
   ));
+
+console.log(select(initialState));
 
 export default store;
